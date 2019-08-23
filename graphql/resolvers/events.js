@@ -21,18 +21,14 @@ export default {
     })
     let createdEvent
 
-    try {
-      const response = await event.save()
-      createdEvent = transformEvent(response)
-      const creator = await User.findById('5d546bab77129545d422ae41')
-      if (!creator) {
-        throw new Error('User not found.')
-      }
-      creator.createdEvents.push(event)
-      await creator.save()
-      return createdEvent
-    } catch (err) {
-      throw err
+    const response = await event.save()
+    createdEvent = transformEvent(response)
+    const creator = await User.findById('5d546bab77129545d422ae41')
+    if (!creator) {
+      throw new Error('User not found.')
     }
+    creator.createdEvents.push(event)
+    await creator.save()
+    return createdEvent
   }
 }
