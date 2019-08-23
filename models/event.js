@@ -23,4 +23,4 @@ const eventSchema = new Schema({
   }
 })
 
-module.exports = model('Event', eventSchema)
+export default model('Event', eventSchema)

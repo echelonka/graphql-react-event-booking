@@ -1,6 +1,6 @@
 import { buildSchema } from 'graphql'
 
-module.exports = buildSchema(`
+export default buildSchema(`
 type Booking {
   _id: ID!
   event: Event!

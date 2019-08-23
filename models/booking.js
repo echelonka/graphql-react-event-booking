@@ -14,4 +14,4 @@ const bookingSchema = new Schema({
   timestamps: true
 })
 
-module.exports = model('Booking', bookingSchema)
+export default model('Booking', bookingSchema)
