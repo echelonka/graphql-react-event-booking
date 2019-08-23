@@ -4,29 +4,26 @@ import { transformEvent } from './merge'
 
 export default {
   events: async () => {
-    try {
-      const events = await Event.find()
-      return events.map(event => transformEvent(event))
-    } catch (err) {
-      throw err
-    }
+    const events = await Event.find()
+    return events.map(event => transformEvent(event))
   },
-  createEvent: async args => {
-    const event = new Event({
-      title: args.eventInput.title,
-      description: args.eventInput.description,
-      price: +args.eventInput.price,
-      date: new Date(args.eventInput.date),
-      creator: '5d546bab77129545d422ae41'
-    })
-    let createdEvent
 
-    const response = await event.save()
-    createdEvent = transformEvent(response)
-    const creator = await User.findById('5d546bab77129545d422ae41')
-    if (!creator) {
-      throw new Error('User not found.')
+  createEvent: async ({ eventInput }, req) => {
+    if (!req.isAuth) {
+      throw new Error('Unauthenticated')
     }
+    const event = new Event({
+      creator: req.userId,
+      date: new Date(eventInput.date),
+      description: eventInput.description,
+      price: +eventInput.price,
+      title: eventInput.title
+    })
+    const createdEvent = transformEvent(await event.save())
+    const creator = await User.findById(req.userId)
+
+    if (!creator) throw new Error('User not found.')
+
     creator.createdEvents.push(event)
     await creator.save()
     return createdEvent

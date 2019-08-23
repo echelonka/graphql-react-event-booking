@@ -5,10 +5,13 @@ import mongoose from 'mongoose'
 
 import graphQlSchema from './graphql/schema'
 import graphQlResolvers from './graphql/resolvers'
+import isAuth from './middleware/is-auth'
 
 const app = express()
 
 app.use(json())
+
+app.use(isAuth)
 
 app.use('/api', graphQlHttp({
   schema: graphQlSchema,

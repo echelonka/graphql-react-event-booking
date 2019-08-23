@@ -3,12 +3,8 @@ import User from '../../models/user'
 import { dateToString } from '../../helpers/date'
 
 const events = async eventIds => {
-  try {
-    const events = await Event.find({ _id: { $in: eventIds } })
-    return events.map(event => transformEvent(event))
-  } catch (err) {
-    throw err
-  }
+  const events = await Event.find({ _id: { $in: eventIds } })
+  return events.map(event => transformEvent(event))
 }
 
 const transformEvent = event => ({
@@ -17,14 +13,7 @@ const transformEvent = event => ({
   creator: user.bind(this, event._doc.creator)
 })
 
-const singleEvent = async eventId => {
-  try {
-    const event = await Event.findById(eventId)
-    return transformEvent(event)
-  } catch (err) {
-    throw err
-  }
-}
+const singleEvent = async eventId => transformEvent(await Event.findById(eventId))
 
 const transformBooking = booking => ({
   ...booking._doc,
@@ -35,14 +24,10 @@ const transformBooking = booking => ({
 })
 
 const user = async userId => {
-  try {
-    const user = await User.findById(userId)
-    return {
-      ...user._doc,
-      createdEvents: events.bind(this, user._doc.createdEvents)
-    }
-  } catch (err) {
-    throw err
+  const user = await User.findById(userId)
+  return {
+    ...user._doc,
+    createdEvents: events.bind(this, user._doc.createdEvents)
   }
 }
 
