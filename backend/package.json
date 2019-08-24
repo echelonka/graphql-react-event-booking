@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js --exec babel-node",
-    "lint": "eslint ./"
+    "dev": "nodemon app.js --exec babel-node"
   },
   "repository": "git@github.com:echelonka/graphql-react-event-booking.git",
   "author": "marinaskripnik97@gmail.com <marinaskripnik97@gmail.com>",
@@ -24,7 +23,6 @@
     "@babel/node": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "babel-loader": "^8.0.6",
-    "eslint": "^6.2.1",
     "nodemon": "^1.19.1"
   }
 }
