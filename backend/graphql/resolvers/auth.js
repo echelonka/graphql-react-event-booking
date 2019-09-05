@@ -1,13 +1,13 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import User from '../../models/user'
+import { errorName } from '../../helpers/constants'
 
 export default {
   createUser: async ({ userInput }) => {
     const existingUser = await User.findOne({ email: userInput.email })
-    if (existingUser) {
-      throw new Error('User with such email already exists.')
-    }
+    if (existingUser) throw new Error(errorName.USER_EXISTS)
+
     const hashedPassword = await bcrypt.hash(userInput.password, 12)
     const user = new User({
       email: userInput.email,
@@ -22,10 +22,10 @@ export default {
 
   login: async ({ email, password }) => {
     const user = await User.findOne({ email: email })
-    if (!user) throw new Error('User does not exist.')
+    if (!user) throw new Error(errorName.INVALID_EMAIL)
 
     const isEqual = await bcrypt.compare(password, user.password)
-    if (!isEqual) throw new Error('Password is incorrect')
+    if (!isEqual) throw new Error(errorName.INVALID_PASSWORD)
 
     const token = await jwt.sign({ userId: user.id, email: user.email }, 'somesupersecretkey', { expiresIn: '1h' })
     return {

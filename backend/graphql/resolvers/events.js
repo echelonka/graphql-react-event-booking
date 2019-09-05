@@ -1,6 +1,7 @@
 import Event from '../../models/event'
 import User from '../../models/user'
 import { transformEvent } from './merge'
+import { errorName } from '../../helpers/constants'
 
 export default {
   events: async () => {
@@ -10,7 +11,7 @@ export default {
 
   createEvent: async ({ eventInput }, req) => {
     if (!req.isAuth) {
-      throw new Error('Unauthenticated')
+      throw new Error(errorName.UNAUTHORIZED)
     }
     const event = new Event({
       creator: req.userId,
@@ -22,7 +23,7 @@ export default {
     const createdEvent = transformEvent(await event.save())
     const creator = await User.findById(req.userId)
 
-    if (!creator) throw new Error('User not found.')
+    if (!creator) throw new Error(errorName.USER_NOT_FOUND)
 
     creator.createdEvents.push(event)
     await creator.save()
