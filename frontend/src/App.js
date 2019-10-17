@@ -19,29 +19,26 @@ class App extends Component {
 
   logout = () => this.setState({ token: null, userId: null })
 
-  render() {
+  render () {
     return (
       <BrowserRouter>
         <AuthContext.Provider
-          value={{
+          value={ {
             token: this.state.token,
             userId: this.state.userId,
             login: this.login,
             logout: this.logout
-          }}
+          } }
         >
-          <MainNavigation />
+          <MainNavigation/>
           <Container className="content">
             <Switch>
-              <Redirect
-                from="/"
-                to={this.state.token ? '/events' : '/auth'}
-                exact
-              />
-              {!this.state.token && <Route path="/auth" component={AuthPage} />}
-              <Route path="/events" component={EventsPage} />
-              {this.state.token && <Route path="/bookings" component={BookingsPage} />}
-              <Redirect from="*" to="/" />
+              { this.state.token && <Redirect from="/" to="/events" exact/> }
+              { this.state.token && <Redirect from="/auth" to="/events" exact/> }
+              { !this.state.token && <Route path="/auth" component={ AuthPage }/> }
+              <Route path="/events" component={ EventsPage }/>
+              { this.state.token && <Route path="/bookings" component={ BookingsPage }/> }
+              { !this.state.token && <Redirect to="/auth" exact/> }
             </Switch>
           </Container>
         </AuthContext.Provider>

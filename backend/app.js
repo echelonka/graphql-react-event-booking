@@ -35,7 +35,7 @@ app.use('/api', graphQlHttp({
 
 const mongoURL = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-h6otv.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`
 
-mongoose.connect(mongoURL, { useNewUrlParser: true })
+mongoose.connect(mongoURL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(8000)
   })

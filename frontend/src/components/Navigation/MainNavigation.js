@@ -6,28 +6,31 @@ import AuthContext from '../../context/auth-context'
 
 const mainNavigation = props => (
   <AuthContext.Consumer>
-    {context => (
+    { context => (
       <AppBar position="static" className="main-navigation">
         <Toolbar>
           <Typography variant="h5" style={ { flexGrow: 1 } }>
             Easy Event
           </Typography>
-          {!context.token ? (
+          { !context.token ? (
             <NavLink to="/auth" className="main-navigation__link">
               <Button color="inherit">Authenticate</Button>
             </NavLink>
-          ) : null}
+          ) : null }
           <NavLink to="/events" className="main-navigation__link">
             <Button color="inherit">Events</Button>
           </NavLink>
-          {context.token && (
-            <NavLink to="/bookings" className="main-navigation__link">
-              <Button color="inherit">Bookings</Button>
-            </NavLink>
-          )}
+          { context.token && (
+            <React.Fragment>
+              <NavLink to="/bookings" className="main-navigation__link">
+                <Button color="inherit">Bookings</Button>
+              </NavLink>
+              <Button color="inherit" onClick={ context.logout }>Logout</Button>
+            </React.Fragment>
+          ) }
         </Toolbar>
       </AppBar>
-    )}
+    ) }
   </AuthContext.Consumer>
 )
 
