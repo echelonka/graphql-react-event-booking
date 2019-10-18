@@ -53,7 +53,7 @@ class Auth extends Component {
       .catch(({ response }) => this.setErrors(response.data.errors))
   }
 
-  signUp = () => {
+  signUp = async () => {
     const data = {
       query: `
         mutation {
@@ -64,14 +64,12 @@ class Auth extends Component {
         }
       `
     }
-
-    axios.post('/api', data).then(({ data }) => {
-      if (data.errors) {
-        this.setErrors(data.errors)
-      } else {
-        // TODO New user created
-      }
-    })
+    const response = (await axios.post('/api', data)).data
+    if (response.errors) {
+      this.setErrors(response.errors)
+    } else {
+      // TODO New user created
+    }
   }
 
   render () {
