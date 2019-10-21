@@ -1,36 +1,38 @@
-import React, { Component } from 'react'
+import React, { useState, useContext } from 'react'
+import { useHistory } from 'react-router-dom'
 import { Button, Card, CardContent, CardActions, Tabs, Tab, TextField, InputAdornment } from '@material-ui/core'
 import { AccountCircleOutlined, LockOutlined } from '@material-ui/icons'
 import axios from 'axios'
 import AuthContext from '../context/auth-context'
 
-class Auth extends Component {
-  state = {
-    email: '',
-    password: '',
-    emailError: null,
-    passwordError: null,
-    currentTab: 0
+function Auth () {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [emailError, setEmailError] = useState(null)
+  const [passwordError, setPasswordError] = useState(null)
+  const [currentTab, setTab] = useState(0)
+
+  const context = useContext(AuthContext)
+  const history = useHistory()
+
+  const switchTab = (event, tab) => {
+    setEmail('')
+    setPassword('')
+    setEmailError('')
+    setPasswordError('')
+    setTab(tab)
   }
 
-  switchTab = (event, tab) => this.setState({
-    email: '',
-    password: '',
-    emailError: null,
-    passwordError: null,
-    currentTab: tab
-  })
+  const setErrors = errors => {
+    setEmailError(errors.filter(error => error.type === 'INVALID_EMAIL').map(error => error.message).join(' '))
+    setPasswordError(errors.filter(error => error.type === 'INVALID_PASSWORD').map(error => error.message).join(' '))
+  }
 
-  setErrors = errors => this.setState({
-    emailError: errors.filter(error => error.type === 'INVALID_EMAIL').map(error => error.message).join(' '),
-    passwordError: errors.filter(error => error.type === 'INVALID_PASSWORD').map(error => error.message).join(' ')
-  })
-
-  logIn = () => {
+  const logIn = () => {
     const data = {
       query: `
         query {
-          login(email: "${ this.state.email }", password: "${ this.state.password }") {
+          login(email: "${ email }", password: "${ password }") {
             userId
             token
             tokenExpiration
@@ -42,22 +44,22 @@ class Auth extends Component {
     axios.post('/api', data).then(response => {
       const data = response.data.data
       if (data.login.token) {
-        this.context.login(
+        context.login(
           data.login.token,
           data.login.userId,
           data.login.tokenExpiration
         )
-        this.props.history.replace('/')
+        history.replace('/')
       }
     })
-      .catch(({ response }) => this.setErrors(response.data.errors))
+      .catch(({ response }) => setErrors(response.data.errors))
   }
 
-  signUp = async () => {
+  const signUp = async () => {
     const data = {
       query: `
         mutation {
-          createUser(userInput: {email: "${ this.state.email }", password: "${ this.state.password }"}) {
+          createUser(userInput: {email: "${ email }", password: "${ password }"}) {
             _id
             email
           }
@@ -66,16 +68,15 @@ class Auth extends Component {
     }
     const response = (await axios.post('/api', data)).data
     if (response.errors) {
-      this.setErrors(response.errors)
+      setErrors(response.errors)
     } else {
       // TODO New user created
     }
   }
 
-  render () {
-    return (
+  return (
       <Card style={ { maxWidth: 500, margin: '0 auto' } }>
-        <Tabs variant="fullWidth" value={ this.state.currentTab } onChange={ this.switchTab }>
+        <Tabs variant="fullWidth" value={ currentTab } onChange={ switchTab }>
           <Tab label="Log In"/>
           <Tab label="Sign Up"/>
         </Tabs>
@@ -87,15 +88,15 @@ class Auth extends Component {
               id="email"
               type="email"
               fullWidth
-              error={ !!this.state.emailError }
-              onChange={ e => this.setState({ email: e.target.value, emailError: '' }) }
-              value={ this.state.email }
-              helperText={ this.state.emailError }
+              error={ !!emailError }
+              onChange={ e => { setEmail(e.target.value); setEmailError('') } }
+              value={ email }
+              helperText={ emailError }
               margin="normal"
               InputProps={ {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <AccountCircleOutlined color={ this.state.emailError ? 'error' : 'action' }/>
+                    <AccountCircleOutlined color={ emailError ? 'error' : 'action' }/>
                   </InputAdornment>
                 ),
               } }
@@ -108,15 +109,15 @@ class Auth extends Component {
               id="password"
               type="password"
               fullWidth
-              error={ !!this.state.passwordError }
-              onChange={ e => this.setState({ password: e.target.value, passwordError: '' }) }
-              value={ this.state.password }
-              helperText={ this.state.passwordError }
+              error={ !!passwordError }
+              onChange={ e => { setPassword(e.target.value); setPasswordError('') } }
+              value={ password }
+              helperText={ passwordError }
               margin="normal"
               InputProps={ {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <LockOutlined color={ this.state.passwordError ? 'error' : 'action' }/>
+                    <LockOutlined color={ passwordError ? 'error' : 'action' }/>
                   </InputAdornment>
                 ),
               } }
@@ -128,17 +129,14 @@ class Auth extends Component {
             fullWidth
             variant="contained"
             color="primary"
-            onClick={ () => this.state.currentTab === 0 ? this.logIn() : this.signUp() }
-            disabled={ !this.state.email || !this.state.password }
+            onClick={ () => currentTab === 0 ? logIn() : signUp() }
+            disabled={ !email || !password }
           >
-            { this.state.currentTab === 0 ? 'Log In' : 'Sign Up' }
+            { currentTab === 0 ? 'Log In' : 'Sign Up' }
           </Button>
         </CardActions>
       </Card>
     )
-  }
 }
-
-Auth.contextType = AuthContext
 
 export default Auth
